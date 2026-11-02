@@ -2,6 +2,7 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { query } from "../db";
 import { signToken } from "../auth";
+import { logActivity } from "../activity";
 
 const router = Router();
 
@@ -28,7 +29,8 @@ router.post("/register", async (req, res) => {
     [email, hash, name]
   );
 
-  const token = signToken({ userId: rows[0].id, email, name, role: "buyer" });
+  const token = signToken({ userId: rows[0].id, email, name, role: "buyer", isActive: true });
+  logActivity({ id: rows[0].id, role: "buyer" }, "user.signup", "user", rows[0].id, "buyer");
   res.status(201).json({
     token,
     user: { id: rows[0].id, email, name, role: "buyer" },

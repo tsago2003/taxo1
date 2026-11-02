@@ -48,18 +48,43 @@ cd frontend && npm run build && npm run preview
 
 ## Demo accounts
 
-| Role   | Email                  | Password  |
-|--------|------------------------|-----------|
-| Seller | demo@thrift-shop.com   | demo1234  |
-| Buyer  | buyer@example.com      | buyer1234 |
+| Role           | Email                  | Password   |
+|----------------|------------------------|------------|
+| Platform admin | admin@rethreed.ge      | admin1234  |
+| Seller         | demo@thrift-shop.com   | demo1234   |
+| Buyer          | buyer@example.com      | buyer1234  |
+
+> The **platform admin** account is created automatically on backend startup
+> (from `ADMIN_EMAIL` / `ADMIN_PASSWORD` env vars) if no admin exists yet.
+
+## Platform admin (general admin)
+
+Run the admin migration once:
+
+```bash
+psql "$DATABASE_URL" -f db/migrate-admin.sql
+```
+
+Then sign in at `http://localhost:5173/admin/login` (admin@rethreed.ge / admin1234).
+The console lives at **`/admin`** and gives you control over:
+
+- **Overview** — platform stats (sellers, buyers, products, orders, revenue, signups) + recent activity
+- **Users** — every signup account (buyers + sellers + admins): search, suspend/activate, delete
+- **Products** — every listing across all shops: search, mark sold/available, delete
+- **Orders** — every order: change status
+- **Activity** — an audit log of everything that happens (signups, product changes, orders, admin actions)
+
+The **seller** (business owner) dashboard moved to **`/seller`** — it still only
+shows that seller's own products and orders.
 
 ## Features
 
-- Separate **buyer** and **seller** platforms (login, register, dashboards)
+- Separate **buyer**, **seller**, and **platform admin** platforms
+- **Platform admin console** (`/admin`): manage all accounts, products, orders, and an activity/audit log
 - Browse with search + filters (category, size, condition, price, sort)
 - Shopping cart + checkout + order confirmation
 - **Recommendation engine** (personalized "For you" based on views, wishlist, purchases)
 - Wishlist, product view tracking
-- Seller dashboard: product CRUD with image upload, order management
+- Seller dashboard (`/seller`): product CRUD with image upload, order management
 - Multi-vendor orders (each seller sees only orders containing their products)
-# taxo1
+- Activity/audit logging across the platform

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { pool, query } from "../db";
 import { requireSeller } from "../middleware";
+import { logActivity } from "../activity";
 
 const router = Router();
 const ORDER_STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
@@ -23,17 +24,19 @@ router.post("/", async (req, res) => {
 
   const buyerId = req.user?.role === "buyer" ? req.user.userId : null;
 
-  const validItems: { product: { id: number; name: string; price: number; size: string | null }; quantity: number }[] = [];
+  const validItems: { product: { id: number; name: string; price: number; size: string | null; quantity: number }; quantity: number }[] = [];
   for (const item of items) {
     const productId = Number(item?.productId);
     const quantity = Number(item?.quantity);
     if (!Number.isInteger(productId) || productId <= 0) return res.status(400).json({ error: "Invalid cart item." });
     if (!Number.isInteger(quantity) || quantity < 1) return res.status(400).json({ error: "Invalid quantity." });
-    const rows = await query<{ id: number; name: string; price: number; size: string | null }>(
-      "SELECT id, name, price, size FROM products WHERE id = $1 AND is_sold = false",
+    const rows = await query<{ id: number; name: string; price: number; size: string | null; quantity: number }>(
+      "SELECT id, name, price, size, quantity FROM products WHERE id = $1 AND is_sold = false AND quantity > 0",
       [productId]
     );
     if (rows.length === 0) return res.status(409).json({ error: "One or more items are no longer available." });
+    if (rows[0].quantity < quantity)
+      return res.status(409).json({ error: `Only ${rows[0].quantity} left in stock for "${rows[0].name}".` });
     validItems.push({ product: rows[0], quantity });
   }
 
@@ -52,9 +55,13 @@ router.post("/", async (req, res) => {
         `INSERT INTO order_items (order_id, product_id, product_name, price, quantity, size) VALUES ($1,$2,$3,$4,$5,$6)`,
         [orderId, it.product.id, it.product.name, it.product.price, it.quantity, it.product.size]
       );
-      await client.query("UPDATE products SET is_sold = true WHERE id = $1", [it.product.id]);
+      await client.query(
+        "UPDATE products SET quantity = GREATEST(quantity - $1, 0), is_sold = (quantity <= $1) WHERE id = $2",
+        [it.quantity, it.product.id]
+      );
     }
     await client.query("COMMIT");
+    logActivity(req.user, "order.placed", "order", orderId);
     res.status(201).json({ id: orderId, total: orderRes.rows[0].total });
   } catch (err) {
     await client.query("ROLLBACK");
@@ -107,6 +114,7 @@ router.patch("/:id", requireSeller, async (req, res) => {
   );
   if (owned.length === 0) return res.status(404).json({ error: "Order not found." });
   await query("UPDATE orders SET status = $1 WHERE id = $2", [status, id]);
+  logActivity(req.user, "order.status_changed", "order", id, status);
   res.json({ success: true });
 });
 

@@ -5,6 +5,7 @@ import crypto from "crypto";
 import fs from "fs";
 import { requireSeller } from "../middleware";
 import { config } from "../config";
+import { analyzeImageBuffer } from "../moderation";
 
 fs.mkdirSync(config.uploadDir, { recursive: true });
 
@@ -29,9 +30,18 @@ const upload = multer({
 
 const router = Router();
 
-router.post("/", requireSeller, upload.single("file"), (req, res) => {
+router.post("/", requireSeller, upload.single("file"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded." });
-  res.status(201).json({ url: `/uploads/${req.file.filename}` });
+
+  let moderation;
+  try {
+    const buffer = fs.readFileSync(req.file.path);
+    moderation = await analyzeImageBuffer(buffer);
+  } catch {
+    moderation = { status: "pending", reasons: ["unreadable_image"], checks: {}, nsfwScore: 0 };
+  }
+
+  res.status(201).json({ url: `/uploads/${req.file.filename}`, moderation });
 });
 
 export default router;

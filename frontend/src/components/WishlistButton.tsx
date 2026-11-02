@@ -1,41 +1,25 @@
 import { createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { api } from "../lib/api";
+import { useWishlist } from "../stores/wishlist";
+import { useI18n } from "../stores/i18n";
+import { HeartIcon } from "./icons";
 
-function HeartIcon(props: { filled: boolean }) {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill={props.filled ? "currentColor" : "none"}
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-    </svg>
-  );
-}
-
-export default function WishlistButton(props: {
-  productId: number;
-  initial?: boolean;
-  class?: string;
-}) {
+export default function WishlistButton(props: { productId: number; class?: string }) {
   const navigate = useNavigate();
-  const [inWishlist, setInWishlist] = createSignal(!!props.initial);
+  const wishlist = useWishlist();
+  const { t } = useI18n();
   const [loading, setLoading] = createSignal(false);
+  const [popped, setPopped] = createSignal(false);
+
+  const inWishlist = () => wishlist.isWishlisted(props.productId);
 
   async function toggle() {
+    if (loading()) return;
     setLoading(true);
     try {
-      const data = inWishlist()
-        ? await api.delete(`/api/wishlist/${props.productId}`)
-        : await api.post("/api/wishlist", { productId: props.productId });
-      setInWishlist(data.inWishlist);
+      await wishlist.toggle(props.productId);
+      setPopped(true);
+      setTimeout(() => setPopped(false), 450);
     } catch (err) {
       if ((err as Error).message === "Unauthorized") {
         navigate("/login");
@@ -50,10 +34,14 @@ export default function WishlistButton(props: {
     <button
       onClick={toggle}
       disabled={loading()}
-      aria-label={inWishlist() ? "Remove from wishlist" : "Add to wishlist"}
-      class={`inline-flex items-center justify-center rounded-full bg-white/90 p-2 text-neutral-600 shadow-sm transition hover:text-red-500 disabled:opacity-50 ${props.class || ""}`}
+      aria-label={
+        inWishlist() ? t("product.wishlistRemove") : t("product.wishlistAdd")
+      }
+      class={`glass inline-flex h-9 w-9 items-center justify-center rounded-full text-charcoal-500 shadow-soft transition-all duration-200 ease-out hover:scale-110 active:scale-95 disabled:opacity-50 ${
+        inWishlist() ? "text-terracotta-500" : "hover:text-terracotta-500"
+      } ${props.class || ""}`}
     >
-      <HeartIcon filled={inWishlist()} />
+      <HeartIcon filled={inWishlist()} class={`h-5 w-5 ${popped() ? "animate-heart-pop" : ""}`} />
     </button>
   );
 }

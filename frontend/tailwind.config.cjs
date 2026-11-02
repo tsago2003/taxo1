@@ -51,6 +51,16 @@ module.exports = {
           600: "#3E3E3A",
           700: "#2C2C2A",
           800: "#1F1F1D",
+          900: "#1A1A1A",
+        },
+        // Warm sand / tan accents
+        sand: {
+          DEFAULT: "#E6D5BE",
+          50: "#FAF6F0",
+          100: "#F2EADD",
+          200: "#E6D5BE",
+          300: "#D5BD9E",
+          400: "#C0A37F",
         },
       },
       fontFamily: {
@@ -76,8 +86,14 @@ module.exports = {
         "soft-md": "0 14px 40px -12px rgba(44, 44, 42, 0.08)",
         "soft-lg": "0 24px 60px -16px rgba(44, 44, 42, 0.12)",
         card: "0 1px 2px rgba(44, 44, 42, 0.04), 0 10px 30px -10px rgba(44, 44, 42, 0.06)",
+        "card-hover": "0 20px 45px -12px rgba(26, 26, 26, 0.12), 0 4px 12px -4px rgba(26, 26, 26, 0.06)",
         float: "0 20px 50px -12px rgba(44, 44, 42, 0.14)",
         "inner-soft": "inset 0 2px 6px rgba(44, 44, 42, 0.06)",
+        glass: "0 8px 32px -8px rgba(26, 26, 26, 0.15)",
+        pill: "inset 0 2px 6px rgba(26, 26, 26, 0.05)",
+      },
+      borderRadius: {
+        "4xl": "2rem",
       },
       transitionDuration: {
         400: "400ms",

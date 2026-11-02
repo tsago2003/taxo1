@@ -48,7 +48,7 @@ async function getRecommendations(userId, limit = 8) {
        (SELECT count(*)::int FROM order_items oi WHERE oi.product_id = p.id) AS orders_count
      FROM products p
      JOIN users u ON u.id = p.user_id
-     WHERE p.is_sold = false AND p.user_id != $1`, [userId]);
+     WHERE p.is_sold = false AND p.moderation_status = 'approved' AND p.user_id != $1`, [userId]);
     const now = Date.now();
     const scored = candidates.map((product) => {
         let score = 0;
@@ -83,7 +83,7 @@ async function getSimilarProducts(productId, limit = 4) {
     return (0, db_1.query)(`SELECT p.*, u.shop_name
      FROM products p
      JOIN users u ON u.id = p.user_id
-     WHERE p.id != $1 AND p.is_sold = false
+     WHERE p.id != $1 AND p.is_sold = false AND p.moderation_status = 'approved'
      ORDER BY
        (p.category = $2) DESC,
        (COALESCE(p.brand, '') = COALESCE($3, '')) DESC,

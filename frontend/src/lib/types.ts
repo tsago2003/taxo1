@@ -1,9 +1,15 @@
+export type Role = "buyer" | "seller" | "admin";
+
 export interface User {
   id: number;
   email: string;
   name: string;
-  role: "buyer" | "seller";
+  role: Role;
   shopName?: string;
+  isActive?: boolean;
+  verificationStatus?: string;
+  shopLocation?: string | null;
+  shopHours?: string | null;
 }
 
 export interface Product {
@@ -17,9 +23,22 @@ export interface Product {
   condition: string;
   brand: string | null;
   image_url: string | null;
+  images?: string[];
+  sale_price?: number | null;
+  measurements?: Record<string, string> | null;
   is_sold: boolean;
+  quantity?: number;
+  recent_views?: number;
+  rating_avg?: number;
+  shop_location?: string | null;
+  shop_hours?: string | null;
+  verification_status?: string;
   created_at: string;
   shop_name?: string;
+  moderation_status?: string;
+  moderation_reasons?: string[];
+  moderated_at?: string | null;
+  moderated_by?: number | null;
 }
 
 export interface OrderItem {

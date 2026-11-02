@@ -7,6 +7,7 @@ const express_1 = require("express");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const db_1 = require("../db");
 const auth_1 = require("../auth");
+const activity_1 = require("../activity");
 const router = (0, express_1.Router)();
 router.post("/register", async (req, res) => {
     const body = req.body ?? {};
@@ -24,7 +25,8 @@ router.post("/register", async (req, res) => {
         return res.status(409).json({ error: "An account with this email already exists." });
     const hash = await bcryptjs_1.default.hash(password, 10);
     const rows = await (0, db_1.query)("INSERT INTO users (email, password_hash, name, role) VALUES ($1, $2, $3, 'buyer') RETURNING id", [email, hash, name]);
-    const token = (0, auth_1.signToken)({ userId: rows[0].id, email, name, role: "buyer" });
+    const token = (0, auth_1.signToken)({ userId: rows[0].id, email, name, role: "buyer", isActive: true });
+    (0, activity_1.logActivity)({ id: rows[0].id, role: "buyer" }, "user.signup", "user", rows[0].id, "buyer");
     res.status(201).json({
         token,
         user: { id: rows[0].id, email, name, role: "buyer" },

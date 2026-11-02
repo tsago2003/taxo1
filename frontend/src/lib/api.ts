@@ -9,6 +9,24 @@ export function setToken(token: string | null) {
   else localStorage.removeItem(TOKEN_KEY);
 }
 
+const DEVICE_KEY = "gigsn_device_id";
+
+function getDeviceId(): string {
+  try {
+    let id = localStorage.getItem(DEVICE_KEY);
+    if (!id) {
+      id =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem(DEVICE_KEY, id);
+    }
+    return id;
+  } catch {
+    return "guest";
+  }
+}
+
 async function request(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string> | undefined),
@@ -18,6 +36,7 @@ async function request(path: string, options: RequestInit = {}) {
   }
   const token = getToken();
   if (token) headers["Authorization"] = `Bearer ${token}`;
+  headers["X-Device-Id"] = getDeviceId();
 
   const res = await fetch(path, { ...options, headers });
   const data = await res.json().catch(() => ({}));

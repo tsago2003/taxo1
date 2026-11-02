@@ -11,6 +11,8 @@ exports.config = {
     port: Number(process.env.PORT) || 4000,
     databaseUrl: process.env.DATABASE_URL || "",
     jwtSecret: process.env.JWT_SECRET || "dev-secret-change-me",
+    adminEmail: process.env.ADMIN_EMAIL || "admin@rethreed.ge",
+    adminPassword: process.env.ADMIN_PASSWORD || "admin1234",
     caCertPath: path_1.default.join(__dirname, "..", "..", "ca-certificate.crt"),
     uploadDir: path_1.default.join(__dirname, "..", "uploads"),
 };

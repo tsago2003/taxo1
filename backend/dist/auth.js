@@ -16,7 +16,9 @@ function verifyToken(token) {
         if (typeof decoded.userId !== "number" ||
             typeof decoded.email !== "string" ||
             typeof decoded.name !== "string" ||
-            (decoded.role !== "buyer" && decoded.role !== "seller")) {
+            (decoded.role !== "buyer" &&
+                decoded.role !== "seller" &&
+                decoded.role !== "admin")) {
             return null;
         }
         return {
@@ -25,6 +27,7 @@ function verifyToken(token) {
             name: decoded.name,
             role: decoded.role,
             shopName: typeof decoded.shopName === "string" ? decoded.shopName : undefined,
+            isActive: typeof decoded.isActive === "boolean" ? decoded.isActive : undefined,
         };
     }
     catch {

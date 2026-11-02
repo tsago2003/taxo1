@@ -19,14 +19,21 @@ export function authOptional(req: Request, _res: Response, next: NextFunction) {
 }
 
 export function requireBuyer(req: Request, res: Response, next: NextFunction) {
-  if (!req.user || req.user.role !== "buyer") {
+  if (!req.user || req.user.role !== "buyer" || req.user.isActive === false) {
     return res.status(401).json({ error: "Unauthorized" });
   }
   next();
 }
 
 export function requireSeller(req: Request, res: Response, next: NextFunction) {
-  if (!req.user || req.user.role !== "seller") {
+  if (!req.user || req.user.role !== "seller" || req.user.isActive === false) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  next();
+}
+
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  if (!req.user || req.user.role !== "admin" || req.user.isActive === false) {
     return res.status(401).json({ error: "Unauthorized" });
   }
   next();

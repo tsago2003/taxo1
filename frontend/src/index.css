@@ -105,6 +105,39 @@
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .animate-spring {
+    animation: spring 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .animate-heart-pop {
+    animation: heartPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .animate-check {
+    animation: checkPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: #ece9e2;
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+    animation: shimmer 1.5s infinite;
+  }
 }
 
 @keyframes fadeUp {
@@ -145,6 +178,54 @@
   }
   50% {
     transform: translateY(-10px);
+  }
+}
+
+@keyframes spring {
+  0% {
+    transform: scale(0.94);
+  }
+  60% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes heartPop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes checkPop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
   }
 }
 

@@ -1,48 +1,65 @@
+import { For } from "solid-js";
 import { A } from "@solidjs/router";
-import { CATEGORIES, COUNTRY, SITE_NAME, SITE_TAGLINE } from "../lib/constants";
+import { CATEGORIES } from "../lib/constants";
+import { useI18n } from "../stores/i18n";
+import Logo from "./Logo";
 
 export default function Footer() {
+  const { t, categoryLabel } = useI18n();
+
   return (
-    <footer class="border-t border-neutral-200 bg-white">
-      <div class="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-3">
+    <footer class="border-t border-charcoal/[0.07] bg-cream-100">
+      <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
         <div>
-          <p class="text-lg font-extrabold text-emerald-700">{SITE_NAME}</p>
-          <p class="mt-2 max-w-xs text-sm text-neutral-500">
-            {SITE_TAGLINE} Shop sustainably and give quality clothes a second life.
+          <Logo />
+          <p class="mt-4 max-w-xs text-sm leading-relaxed text-charcoal-500">
+            {t("siteTagline")} {t("footer.tagline")}
           </p>
         </div>
+
         <div>
-          <p class="text-sm font-semibold text-neutral-800">Shop</p>
-          <ul class="mt-3 space-y-2 text-sm text-neutral-500">
+          <p class="text-sm font-semibold text-charcoal-700">{t("footer.shop")}</p>
+          <ul class="mt-3 space-y-2 text-sm text-charcoal-500">
             <li>
-              <A href="/products" class="hover:text-emerald-700">All products</A>
+              <A href="/products" class="transition-colors hover:text-moss-600">
+                {t("footer.allProducts")}
+              </A>
             </li>
             <li>
-              <A href="/seller/register" class="hover:text-emerald-700">Become a seller</A>
+              <A href="/seller/register" class="transition-colors hover:text-moss-600">
+                {t("footer.becomeSeller")}
+              </A>
             </li>
             <li>
-              <A href="/seller/login" class="hover:text-emerald-700">Seller login</A>
+              <A href="/seller/login" class="transition-colors hover:text-moss-600">
+                {t("footer.sellerLogin")}
+              </A>
             </li>
           </ul>
         </div>
+
         <div>
-          <p class="text-sm font-semibold text-neutral-800">Categories</p>
+          <p class="text-sm font-semibold text-charcoal-700">{t("footer.categories")}</p>
           <ul class="mt-3 flex flex-wrap gap-2">
-            {CATEGORIES.map((category) => (
-              <li>
-                <A
-                  href={`/products?category=${encodeURIComponent(category)}`}
-                  class="inline-block rounded-full border border-neutral-200 px-3 py-1 text-xs text-neutral-600 transition hover:border-emerald-600 hover:text-emerald-700"
-                >
-                  {category}
-                </A>
-              </li>
-            ))}
+            <For each={CATEGORIES}>
+              {(category) => (
+                <li>
+                  <A
+                    href={`/products?category=${encodeURIComponent(category)}`}
+                    class="inline-block rounded-full border border-charcoal/10 bg-white px-3 py-1.5 text-xs text-charcoal-500 transition-all duration-300 hover:border-moss-300 hover:text-moss-600"
+                  >
+                    {categoryLabel(category)}
+                  </A>
+                </li>
+              )}
+            </For>
           </ul>
         </div>
       </div>
-      <div class="border-t border-neutral-200 py-5 text-center text-xs text-neutral-400">
-        © {new Date().getFullYear()} {SITE_NAME}. All rights reserved. · Prices in GEL (₾) · Serving {COUNTRY}.
+
+      <div class="border-t border-charcoal/[0.07] py-6 text-center text-xs text-charcoal-400">
+        © {new Date().getFullYear()} ReThread · რეთრედ. {t("footer.rights")} ·{" "}
+        {t("hero.trust.gel")}
       </div>
     </footer>
   );
