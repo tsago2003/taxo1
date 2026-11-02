@@ -62,3 +62,4 @@ cd frontend && npm run build && npm run preview
 - Wishlist, product view tracking
 - Seller dashboard: product CRUD with image upload, order management
 - Multi-vendor orders (each seller sees only orders containing their products)
+# taxo1
