@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ReThread — Second-hand Clothes Marketplace
 
-## Getting Started
+A full-stack marketplace for pre-loved clothes in Georgia (prices in **GEL ₾**).
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Frontend:** SolidJS + Vite + Tailwind CSS (`frontend/`)
+- **Backend:** Express.js + TypeScript + PostgreSQL (`backend/`)
+- **Database:** PostgreSQL (DigitalOcean managed) — schema in `db/`
+
+## Project structure
+
+```
+backend/     Express API (port 4000)
+frontend/    SolidJS SPA (Vite dev server, default port 5173)
+db/          schema.sql, migrate.sql, seed.sql
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Backend
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+cd backend
+npm install
+npm run dev        # starts API on http://localhost:4000
+```
 
-## Learn More
+The backend reads `backend/.env` (already configured with your DB URL + JWT secret).
+It uses `ca-certificate.crt` at the repo root for the SSL connection.
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Frontend
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cd frontend
+npm install
+npm run dev        # starts Vite on http://localhost:5173
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+The Vite dev server proxies `/api` and `/uploads` to the backend on port 4000.
 
-## Deploy on Vercel
+### Production
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+cd backend && npm run build && npm start
+cd frontend && npm run build && npm run preview
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Demo accounts
+
+| Role   | Email                  | Password  |
+|--------|------------------------|-----------|
+| Seller | demo@thrift-shop.com   | demo1234  |
+| Buyer  | buyer@example.com      | buyer1234 |
+
+## Features
+
+- Separate **buyer** and **seller** platforms (login, register, dashboards)
+- Browse with search + filters (category, size, condition, price, sort)
+- Shopping cart + checkout + order confirmation
+- **Recommendation engine** (personalized "For you" based on views, wishlist, purchases)
+- Wishlist, product view tracking
+- Seller dashboard: product CRUD with image upload, order management
+- Multi-vendor orders (each seller sees only orders containing their products)
