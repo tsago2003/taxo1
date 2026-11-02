@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import { config } from "./config";
 import { authOptional } from "./middleware";
 import { ensureAdmin } from "./bootstrap";
@@ -41,6 +42,19 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   console.error(err);
   res.status(500).json({ error: "Internal server error" });
 });
+
+// Serve the built frontend so the whole app can run on a single origin/port
+// (useful for dev servers without a reverse proxy / domain).
+const frontendDist = path.join(__dirname, "..", "..", "frontend", "dist");
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.use((req, res, next) => {
+    if (req.method !== "GET" || req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDist, "index.html"));
+  });
+}
 
 ensureAdmin();
 

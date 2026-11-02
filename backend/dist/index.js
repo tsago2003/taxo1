@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 const config_1 = require("./config");
 const middleware_1 = require("./middleware");
 const bootstrap_1 = require("./bootstrap");
@@ -40,6 +41,18 @@ app.use((err, _req, res, _next) => {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
 });
+// Serve the built frontend so the whole app can run on a single origin/port
+// (useful for dev servers without a reverse proxy / domain).
+const frontendDist = path_1.default.join(__dirname, "..", "..", "frontend", "dist");
+if (fs_1.default.existsSync(frontendDist)) {
+    app.use(express_1.default.static(frontendDist));
+    app.use((req, res, next) => {
+        if (req.method !== "GET" || req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
+            return next();
+        }
+        res.sendFile(path_1.default.join(frontendDist, "index.html"));
+    });
+}
 (0, bootstrap_1.ensureAdmin)();
 app.listen(config_1.config.port, () => {
     console.log(`API listening on http://localhost:${config_1.config.port}`);

@@ -27,6 +27,10 @@ function getDeviceId(): string {
   }
 }
 
+// Base URL for the API. In dev the Vite proxy handles /api; for a production
+// build set VITE_API_URL to the backend origin (e.g. http://YOUR_SERVER:4000).
+const API_BASE = ((import.meta as any).env?.VITE_API_URL as string) || "";
+
 async function request(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string> | undefined),
@@ -38,7 +42,7 @@ async function request(path: string, options: RequestInit = {}) {
   if (token) headers["Authorization"] = `Bearer ${token}`;
   headers["X-Device-Id"] = getDeviceId();
 
-  const res = await fetch(path, { ...options, headers });
+  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(data.error || "Something went wrong");
